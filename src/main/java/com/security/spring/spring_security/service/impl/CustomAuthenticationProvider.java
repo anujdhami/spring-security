@@ -22,18 +22,18 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         System.out.println("From custom authentication provider");
-        String userName= authentication.getName();
+        String userName= String.valueOf(authentication.getPrincipal());
         String password= String.valueOf(authentication.getCredentials());
         System.out.println("Username is: "+ userName);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
         if(passwordEncoder.matches(password,userDetails.getPassword())){
-            return new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
+            return new CustomAuthenticationToken(userDetails.getAuthorities(),userDetails,null);
         }
         return null;
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        return CustomAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }

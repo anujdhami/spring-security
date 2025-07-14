@@ -4,6 +4,7 @@ import com.security.spring.spring_security.entity.CustomUserDetails;
 import com.security.spring.spring_security.repo.CustomUserDetailsRepo;
 import com.security.spring.spring_security.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,6 +33,9 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @Override
     public void createUser(UserDetails user) {
         CustomUserDetails customUserDetails= (CustomUserDetails) user;
+        if(checkFormat(user.getUsername()) || checkFormat(user.getPassword())){
+            throw new BadCredentialsException("Username and Password cannot have : in it");
+        }
         Optional<CustomUserDetails> userDetails = userDetailsRepo.findByUsername(customUserDetails.getUsername());
         if(userDetails.isPresent()){
             throw new RuntimeException("User with same userName already present");
@@ -58,5 +62,9 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @Override
     public boolean userExists(String username) {
         return false;
+    }
+
+    private boolean checkFormat(String value){
+        return value.contains(":");
     }
 }

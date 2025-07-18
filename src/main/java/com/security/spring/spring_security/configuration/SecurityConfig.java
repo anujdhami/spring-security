@@ -2,6 +2,7 @@ package com.security.spring.spring_security.configuration;
 
 import com.security.spring.spring_security.service.impl.CustomAuthenticationFilter;
 import com.security.spring.spring_security.service.impl.CustomAuthenticationProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.List;
 
@@ -34,6 +37,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationFilter customAuthenticationFilter) throws Exception {
+        http.cors(corsConfig->corsConfig.configurationSource(new CorsConfigurationSource() {
+            @Override
+            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                CorsConfiguration corsConfiguration= new CorsConfiguration();
+                corsConfiguration.setAllowCredentials(true);
+                corsConfiguration.addAllowedHeader("*");
+                corsConfiguration.setAllowedMethods(List.of("*"));
+                corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+                corsConfiguration.setMaxAge(3600L);
+                return corsConfiguration;
+            }
+        }));
         http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth->
                 auth.requestMatchers("/user/login/**").permitAll().anyRequest().authenticated()).httpBasic(httpSecurityHttpBasicConfigurer -> {});
         http.addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

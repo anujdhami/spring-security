@@ -4,10 +4,7 @@ import com.security.spring.spring_security.entity.CustomUserDetails;
 import com.security.spring.spring_security.service.CustomUserDetailsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("user/login")
@@ -20,5 +17,10 @@ public class UserController {
     public String createUser(@RequestBody @Valid CustomUserDetails customUserDetails){
         customUserDetailsService.createUser(customUserDetails);
         return "User created successfully";
+    }
+
+    @GetMapping("/cors-testing")
+    public String testCorsSettings(){
+        return "Tested cors setting";
     }
 }
